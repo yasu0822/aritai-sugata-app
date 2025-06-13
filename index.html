@@ -1,373 +1,173 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ありたい姿探究アプリ</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            font-family: 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
             min-height: 100vh;
-            font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .glass-effect {
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
             background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
-        .gold-accent {
+        
+        h1 {
+            text-align: center;
             color: #d4af37;
+            margin-bottom: 30px;
+            font-size: 28px;
         }
-        .input-field {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            transition: all 0.3s ease;
+        
+        .input-group {
+            margin-bottom: 20px;
         }
-        .input-field:focus {
-            border-color: #d4af37;
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d4af37;
+            font-weight: bold;
         }
-        .btn-primary {
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
             background: linear-gradient(45deg, #d4af37, #f4d03f);
             color: #1a1a2e;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+        
+        button:hover {
+            background: linear-gradient(45deg, #f4d03f, #d4af37);
         }
-        .result-card {
-            background: rgba(26, 26, 46, 0.8);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            backdrop-filter: blur(15px);
-        }
-        .char-counter {
-            font-size: 0.75rem;
-            color: #d4af37;
-        }
-        .char-counter.warning {
-            color: #ff6b6b;
-        }
-        .loading {
+        
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border-radius: 10px;
             display: none;
-        }
-        .loading.active {
-            display: inline-block;
         }
     </style>
 </head>
-<body class="text-white">
-    <!-- アクセスコード入力画面 -->
-    <div id="accessCodeScreen" class="min-h-screen flex items-center justify-center p-4">
-        <div class="glass-effect rounded-3xl p-8 w-full max-w-md text-center">
-            <div class="mb-6">
-                <i class="fas fa-key text-4xl gold-accent mb-4"></i>
-                <h1 class="text-2xl font-bold mb-2">ありたい姿探究アプリ</h1>
-                <p class="text-gray-300">イベント参加者専用</p>
-            </div>
-            <div class="mb-6">
-                <label class="block text-sm font-medium mb-2 gold-accent">アクセスコード</label>
-                <input type="password" id="accessCodeInput" class="input-field w-full px-4 py-3 rounded-xl text-white text-center tracking-wider" placeholder="コードを入力してください">
-            </div>
-            <button onclick="checkAccessCode()" class="btn-primary w-full py-3 rounded-xl">
-                <i class="fas fa-unlock-alt mr-2"></i>アクセス
-            </button>
-            <p class="text-xs text-gray-400 mt-4">イベント主催者からお伝えしたコードを入力してください</p>
+<body>
+    <div class="container">
+        <h1>ありたい姿探究アプリ</h1>
+        
+        <div class="input-group">
+            <label for="accessCode">アクセスコード</label>
+            <input type="text" id="accessCode" placeholder="イベント専用コードを入力">
         </div>
-    </div>
-
-    <!-- メインアプリ画面 -->
-    <div id="mainApp" class="hidden min-h-screen py-8 px-4">
-        <div class="max-w-4xl mx-auto">
-            <!-- ヘッダー -->
-            <div class="text-center mb-8">
-                <h1 class="text-3xl md:text-4xl font-bold mb-4">
-                    <i class="fas fa-compass gold-accent mr-3"></i>
-                    ありたい姿探究アプリ
-                </h1>
-                <p class="text-gray-300 text-lg">あなたの内に秘められた可能性を発見しましょう</p>
-            </div>
-
-            <!-- API設定 -->
-            <div class="glass-effect rounded-2xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 gold-accent">
-                    <i class="fas fa-cog mr-2"></i>設定
-                </h2>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">OpenAI APIキー</label>
-                    <input type="password" id="apiKey" class="input-field w-full px-4 py-3 rounded-xl text-white" placeholder="sk-...">
-                    <p class="text-xs text-gray-400 mt-1">APIキーはブラウザに安全に保存されます</p>
-                </div>
-            </div>
-
-            <!-- 入力セクション -->
-            <div class="glass-effect rounded-2xl p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 gold-accent">
-                    <i class="fas fa-pen-fancy mr-2"></i>あなたの想いを教えてください
-                </h2>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">ワード・文章（改行で区切って入力、最大20個）</label>
-                    <textarea id="wordsInput" class="input-field w-full px-4 py-4 rounded-xl text-white h-40 resize-none" placeholder="例：&#10;リーダーシップを発揮したい&#10;創造的なアイデアを生み出す&#10;チームメンバーを大切にする&#10;新しいことに挑戦する勇気"></textarea>
-                    <div id="inputStatus" class="flex justify-between items-center mt-2 text-xs">
-                        <span id="lineCount" class="text-gray-400">0行 / 20行</span>
-                        <span id="charWarning" class="char-counter"></span>
-                    </div>
-                </div>
-                <button onclick="analyzeVision()" id="analyzeBtn" class="btn-primary px-8 py-3 rounded-xl">
-                    <i class="fas fa-search mr-2"></i>
-                    <span class="loading" id="loadingSpinner">
-                        <i class="fas fa-spinner fa-spin mr-2"></i>分析中...
-                    </span>
-                    <span id="btnText">ありたい姿を発見する</span>
-                </button>
-            </div>
-
-            <!-- 結果表示セクション -->
-            <div id="resultSection" class="hidden">
-                <div class="result-card rounded-2xl p-6 mb-6">
-                    <h2 class="text-xl font-semibold mb-4 gold-accent">
-                        <i class="fas fa-star mr-2"></i>あなたのありたい姿
-                    </h2>
-                    <div id="visionResult" class="text-white leading-relaxed"></div>
-                </div>
-
-                <div class="result-card rounded-2xl p-6">
-                    <h2 class="text-xl font-semibold mb-4 gold-accent">
-                        <i class="fas fa-tasks mr-2"></i>具体的な行動案
-                    </h2>
-                    <div id="actionResult" class="text-white leading-relaxed"></div>
-                </div>
-            </div>
+        
+        <div class="input-group">
+            <label for="wordsInput">あなたの価値観やありたい姿に関するワード・文章（改行で区切って入力）</label>
+            <textarea id="wordsInput" placeholder="例：&#10;リーダーシップ&#10;創造性&#10;学び続ける姿勢"></textarea>
         </div>
+        
+        <button onclick="analyzeWords()">ありたい姿を探究する</button>
+        
+        <div id="result"></div>
     </div>
 
     <script>
-        // アクセスコード認証
-        function checkAccessCode() {
-            const validCodes = ['VISION2025JUL'];
-            const userCode = document.getElementById('accessCodeInput').value.trim();
-            
-            if (validCodes.includes(userCode)) {
-                document.getElementById('accessCodeScreen').style.display = 'none';
-                document.getElementById('mainApp').classList.remove('hidden');
-                loadSettings();
-            } else {
-                alert('正しいアクセスコードを入力してください。');
-                document.getElementById('accessCodeInput').value = '';
-            }
-        }
-
-        // 設定の読み込み
-        function loadSettings() {
-            const savedApiKey = localStorage.getItem('openai_api_key');
-            if (savedApiKey) {
-                document.getElementById('apiKey').value = savedApiKey;
-            }
-        }
-
-        // 入力監視
-        document.getElementById('wordsInput').addEventListener('input', function() {
-            const lines = this.value.split('\n').filter(line => line.trim() !== '');
-            const lineCount = lines.length;
-            
-            document.getElementById('lineCount').textContent = `${lineCount}行 / 20行`;
-            
-            // 100文字超過チェック
-            let hasLongLine = false;
-            let maxLength = 0;
-            
-            lines.forEach(line => {
-                if (line.length > 100) {
-                    hasLongLine = true;
-                }
-                maxLength = Math.max(maxLength, line.length);
-            });
-            
-            const charWarning = document.getElementById('charWarning');
-            if (hasLongLine) {
-                charWarning.textContent = `最長行: ${maxLength}文字（100文字以内推奨）`;
-                charWarning.className = 'char-counter warning';
-            } else if (maxLength > 80) {
-                charWarning.textContent = `最長行: ${maxLength}文字`;
-                charWarning.className = 'char-counter';
-            } else {
-                charWarning.textContent = '';
-            }
-            
-            if (lineCount > 20) {
-                alert('20行以内で入力してください。');
-                const limitedLines = lines.slice(0, 20);
-                this.value = limitedLines.join('\n');
-            }
-        });
-
-        // Enterキーでアクセスコード認証
-        document.getElementById('accessCodeInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                checkAccessCode();
-            }
-        });
-
-        // 分析実行
-        async function analyzeVision() {
-            const apiKey = document.getElementById('apiKey').value.trim();
-            const wordsInput = document.getElementById('wordsInput').value.trim();
-            
-            if (!apiKey) {
-                alert('OpenAI APIキーを入力してください。');
-                return;
-            }
-            
-            if (!wordsInput) {
-                alert('ワード・文章を入力してください。');
-                return;
-            }
-            
-            // APIキーを保存
-            localStorage.setItem('openai_api_key', apiKey);
-            
-            // UI状態変更
-            const analyzeBtn = document.getElementById('analyzeBtn');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const btnText = document.getElementById('btnText');
-            
-            analyzeBtn.disabled = true;
-            loadingSpinner.classList.add('active');
-            btnText.style.display = 'none';
-            
+        function analyzeWords() {
             try {
-                const prompt = `
-あなたは百戦錬磨のメンターです。
-
-入力されたワード・文章を深く分析し、そこに秘められた可能性を見つけ出し、
-ユーザーが心からワクワクして「これやってみたい！」と思える魅力的な提案をしてください。
-
-入力されたワード・文章：
-${wordsInput}
-
-以下の形式で、探究心をくすぐる魅力的な表現で出力してください：
-
-ありたい姿：[夢と希望に満ちた魅力的な15-25文字表現]
-
-解説：[ワクワクする具体的シーンを含む100-150文字の描写]
-
-行動案：
-1. [楽しみながら実践できる具体的行動]
-2. [発見や成長を感じられる具体的行動]
-3. [仲間と一緒に取り組める具体的行動]
-
-※入力ワードをそのまま使わず、その奥にある本質的な魅力を表現すること
-※ユーザーが内発的にやりたくなるような表現を心がけること
-`;
-
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                // 要素の取得
+                const accessCodeElement = document.getElementById('accessCode');
+                const wordsInputElement = document.getElementById('wordsInput');
+                
+                if (!accessCodeElement || !wordsInputElement) {
+                    alert('入力欄が見つかりません。ページを再読み込みしてください。');
+                    return;
+                }
+                
+                const accessCode = accessCodeElement.value.trim();
+                const words = wordsInputElement.value.trim();
+                
+                // 入力チェック
+                if (!accessCode) {
+                    alert('アクセスコードを入力してください');
+                    return;
+                }
+                
+                if (!words) {
+                    alert('ワードまたは文章を入力してください');
+                    return;
+                }
+                
+                // 分析実行
+                document.getElementById('result').innerHTML = '分析中...';
+                document.getElementById('result').style.display = 'block';
+                
+                fetch('/api/analyze', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        model: 'gpt-3.5-turbo',
-                        messages: [
-                            {
-                                role: 'user',
-                                content: prompt
-                            }
-                        ],
-                        max_tokens: 1000,
-                        temperature: 0.8
+                        words: words,
+                        accessCode: accessCode
                     })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('分析中にエラーが発生しました: ' + data.error);
+                        document.getElementById('result').style.display = 'none';
+                        return;
+                    }
+                    
+                    document.getElementById('result').innerHTML = '<pre style="white-space: pre-wrap; font-family: inherit;">' + data.result + '</pre>';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('分析中にエラーが発生しました');
+                    document.getElementById('result').style.display = 'none';
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`APIエラー: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                const result = data.choices[0].message.content;
-                
-                displayResult(result);
-                
             } catch (error) {
-                console.error('Error:', error);
-                alert('分析中にエラーが発生しました。APIキーを確認するか、時間をおいてトライしてください。');
-            } finally {
-                // UI状態をリセット
-                analyzeBtn.disabled = false;
-                loadingSpinner.classList.remove('active');
-                btnText.style.display = 'inline';
+                console.error('Analysis error:', error);
+                alert('エラーが発生しました: ' + error.message);
             }
-        }
-
-        // 結果表示
-        function displayResult(result) {
-            const lines = result.split('\n').filter(line => line.trim() !== '');
-            
-            let visionTitle = '';
-            let visionExplanation = '';
-            let actions = [];
-            
-            let currentSection = '';
-            
-            for (let line of lines) {
-                line = line.trim();
-                
-                if (line.startsWith('ありたい姿：')) {
-                    visionTitle = line.replace('ありたい姿：', '').trim();
-                    currentSection = 'vision';
-                } else if (line.startsWith('解説：')) {
-                    visionExplanation = line.replace('解説：', '').trim();
-                    currentSection = 'explanation';
-                } else if (line.startsWith('行動案：')) {
-                    currentSection = 'actions';
-                } else if (line.match(/^\d+\./)) {
-                    const actionText = line.replace(/^\d+\./, '').trim();
-                    actions.push(actionText);
-                } else if (currentSection === 'explanation' && line.length > 0) {
-                    visionExplanation += line;
-                } else if (currentSection === 'vision' && line.length > 0 && !visionExplanation) {
-                    visionExplanation = line;
-                }
-            }
-            
-            // ありたい姿の表示
-            const visionHtml = `
-                <div class="mb-4">
-                    <h3 class="text-lg font-bold gold-accent mb-2">${visionTitle}</h3>
-                    <p class="text-gray-200 leading-relaxed">${visionExplanation}</p>
-                </div>
-            `;
-            
-            // 行動案の表示
-            const actionsHtml = actions.map((action, index) => `
-                <div class="mb-4 p-4 bg-gray-800 bg-opacity-50 rounded-xl border border-gray-600">
-                    <div class="flex items-start">
-                        <span class="gold-accent font-bold text-lg mr-3">${index + 1}.</span>
-                        <p class="text-gray-200 leading-relaxed flex-1">${action}</p>
-                    </div>
-                </div>
-            `).join('');
-            
-            document.getElementById('visionResult').innerHTML = visionHtml;
-            document.getElementById('actionResult').innerHTML = actionsHtml;
-            document.getElementById('resultSection').classList.remove('hidden');
-            
-            // 結果セクションにスクロール
-            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
 </html>
-    <script id="html_badge_script1">
-        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDvYkxzPTP0hISbEA%2BEXiT6byyy5imLjKlWE4bbPLGiNnwKEQW8X%2FafHkWXGBVH2DGHeWqyVdypNN%2FPpKRjE3WGMs4DtMAS7wuWjr%2FiynqzjP4ABGTY61VNQ3hGczwU5QEtVhMnsLUvQ4p22Tv4Ux5GckKxH%2B3CJf3jRYQEjcJGquIdcJQgAlsV8b69CslwZyIDTIvWxwQRZ5vuWBuvlX1EphAjm29JeEsHVfo7HMuvH3JHEaEog35KclCSdqbgia1gWz%2F%2BEFG9V9X8moEoReq8kBDxKgeHHZXYAlkTNF4fvirOKgX4MCy1BRNgKE9lIcjmECuh4fVRDTd8CRwP0mi%2BtfclVsd2OFVcc9mHJmW7k4WhAhOYfjfZj6P2%2BChFA0kmm4wI%2FWZGJj%2BOCsmrq3okGm2sI4lbhbufS9pbCbh0fECD9ruAyU%2BlCOY1myxFslb4snV4ppxaraJQG3otKD5Oq7177ughy21pHtF42%2F183PmSgoD8UwFE48dGwTzUfuwyLIpw3qTnMU3IrHR%2Fb78uU%3D";
-        window.__genspark_locale = "ja-JP";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDvYkxzPTP0hISbEA+EXiT6byyy5imLjKlWE4bbPLGiNnwKEQW8X/afHkWXGBVH2DGHeWqyVdypNN/PpKRjE3WGMs4DtMAS7wuWjr/iynqzjP4ABGTY61VNQ3hGczwU5QEtVhMnsLUvQ4p22Tv4Ux5GckKxH+3CJf3jRYQEjcJGquIdcJQgAlsV8b69CslwZyIDTIvWxwQRZ5vuWBuvlX1EphAjm29JeEsHVfo7HMuvH3JHEaEog35KclCSdqbgia1gWz/+EFG9V9X8moEoReq8kBDxKgeHHZXYAlkTNF4fvirOKgX4MCy1BRNgKE9lIcjmECuh4fVRDTd8CRwP0mi+tfclVsd2OFVcc9mHJmW7k4WhAhOYfjfZj6P2+ChFA0kmm4wI/WZGJj+OCsmrq3okGm2sI4lbhbufS9pbCbh0fECD9ruAyU+lCOY1myxFslb4snV4ppxaraJQG3otKD5Oq7177ughy21pHtF42/183PmSgoD8UwFE48dGwTzUfuwyLIpw3qTnMU3IrHR/b78uU=";
-    </script>
-    
-    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
-    
